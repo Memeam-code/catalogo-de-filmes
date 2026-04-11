@@ -1,66 +1,123 @@
-import Image from "next/image";
-import styles from "./page.module.css";
+'use client';
 
+import { useState, useEffect } from 'react';
+import styles from './page.module.css';
+
+// O componente Home é o ponto de entrada da rota "/"
 export default function Home() {
+  const [movies, setMovies] = useState([]);
+  const [favorites, setFavorites] = useState([]);
+  const [search, setSearch] = useState('batman');
+  const [query, setQuery] = useState('batman');
+
+  // useEffect executa apenas uma vez ao carregar (ou quando query muda)
+  useEffect(() => {
+    fetch(`https://www.omdbapi.com/?s=${query}&apikey=demo`)
+      .then(res => res.json())
+      .then(data => {
+        if (data.Search) {
+          setMovies(data.Search);
+        }
+      });
+  }, [query]); // [] = executa apenas uma vez, ao carregar
+
+  // Adicionar um filme aos favoritos
+  const handleFavorite = (movie) => {
+    setFavorites(prev => [...prev, movie]);
+  };
+
+  // Remover um filme dos favoritos
+  const handleRemoveFavorite = (imdbID) => {
+    setFavorites(prev => prev.filter(m => m.imdbID !== imdbID));
+  };
+
+  // Verificar se um filme já foi favoritado
+  const isFavorited = (imdbID) => favorites.some(m => m.imdbID === imdbID);
+
+  // Executar busca ao submeter o formulário
+  const handleSearch = (e) => {
+    e.preventDefault();
+    setQuery(search);
+  };
+
   return (
-    <div className={styles.page}>
-      <main className={styles.main}>
-        <Image
-          className={styles.logo}
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
+    <main className={styles.main}>
+      <header className={styles.header}>
+        <h1>Catálogo de Filmes 🎬</h1>
+        <p>Bem-vindo ao nosso portal de cinema!</p>
+        <p>Explore os melhores lançamentos aqui.</p>
+      </header>
+
+      {/* Campo de busca por título */}
+      <form className={styles.searchForm} onSubmit={handleSearch}>
+        <input
+          className={styles.searchInput}
+          type="text"
+          value={search}
+          onChange={e => setSearch(e.target.value)}
+          placeholder="Buscar filme..."
         />
-        <div className={styles.intro}>
-          <h1>To get started, edit the page.js file.</h1>
-          <p>
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
+        <button className={styles.searchButton} type="submit">
+          Buscar
+        </button>
+      </form>
+
+      {/* Lista de filmes buscados da API */}
+      <section>
+        <h2 className={styles.sectionTitle}>Filmes</h2>
+        <div className={styles.grid}>
+          {movies.map(movie => (
+            <div key={movie.imdbID} className={styles.card}>
+              <img
+                src={movie.Poster !== 'N/A' ? movie.Poster : 'https://via.placeholder.com/150x220?text=Sem+Imagem'}
+                alt={movie.Title}
+                className={styles.poster}
+                width="150"
+              />
+              <div className={styles.cardInfo}>
+                <h3 className={styles.movieTitle}>{movie.Title}</h3>
+                <p className={styles.movieYear}>{movie.Year}</p>
+                <button
+                  className={`${styles.favButton} ${isFavorited(movie.imdbID) ? styles.favButtonActive : ''}`}
+                  onClick={() => handleFavorite(movie)}
+                  disabled={isFavorited(movie.imdbID)}
+                >
+                  {isFavorited(movie.imdbID) ? '⭐ Favoritado' : '☆ Favoritar'}
+                </button>
+              </div>
+            </div>
+          ))}
         </div>
-        <div className={styles.ctas}>
-          <a
-            className={styles.primary}
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className={styles.logo}
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className={styles.secondary}
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
-    </div>
+      </section>
+
+      {/* Seção de favoritos — aparece só quando há favoritos */}
+      {favorites.length > 0 && (
+        <section className={styles.favoritesSection}>
+          <h2 className={styles.sectionTitle}>Meus Favoritos ⭐</h2>
+          <div className={styles.grid}>
+            {favorites.map(movie => (
+              <div key={movie.imdbID} className={styles.card}>
+                <img
+                  src={movie.Poster !== 'N/A' ? movie.Poster : 'https://via.placeholder.com/150x220?text=Sem+Imagem'}
+                  alt={movie.Title}
+                  className={styles.poster}
+                  width="150"
+                />
+                <div className={styles.cardInfo}>
+                  <h3 className={styles.movieTitle}>{movie.Title}</h3>
+                  <p className={styles.movieYear}>{movie.Year}</p>
+                  <button
+                    className={styles.removeButton}
+                    onClick={() => handleRemoveFavorite(movie.imdbID)}
+                  >
+                    Remover
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
+    </main>
   );
 }
