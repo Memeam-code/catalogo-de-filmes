@@ -94,47 +94,85 @@
 
 /* Barra de populares */
 .popularesArea {
-  margin-bottom: 32px;
+  margin-bottom: 36px;
 }
 
 .popularesLabel {
-  font-size: 0.85rem;
+  font-size: 0.8rem;
   font-weight: 600;
-  color: #888;
-  margin-bottom: 10px;
+  color: #999;
+  margin-bottom: 12px;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
+  letter-spacing: 1px;
 }
 
 .populares {
   display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
+  gap: 12px;
+  overflow-x: auto;
+  padding-bottom: 8px;
+  scrollbar-width: thin;
+  scrollbar-color: #ddd transparent;
+}
+
+.populares::-webkit-scrollbar {
+  height: 4px;
+}
+
+.populares::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.populares::-webkit-scrollbar-thumb {
+  background: #ddd;
+  border-radius: 4px;
 }
 
 .popularBtn {
-  padding: 8px 16px;
-  font-size: 0.85rem;
-  font-weight: 500;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 0;
   background: #fff;
-  color: #1a1a2e;
   border: 2px solid #e0e0e0;
-  border-radius: 20px;
+  border-radius: 12px;
   cursor: pointer;
   transition: all 0.2s;
-  white-space: nowrap;
+  overflow: hidden;
+  min-width: 90px;
+  flex-shrink: 0;
 }
 
 .popularBtn:hover {
   border-color: #4a90d9;
-  color: #4a90d9;
-  background: #f0f6ff;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(74, 144, 217, 0.2);
+}
+
+.popularBtn span {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #1a1a2e;
+  padding: 0 8px 8px;
+  text-align: center;
+  line-height: 1.2;
+}
+
+.popularPoster {
+  width: 90px;
+  height: 120px;
+  object-fit: cover;
+  display: block;
 }
 
 .popularAtivo {
-  background: #4a90d9;
-  color: #fff;
   border-color: #4a90d9;
+  box-shadow: 0 0 0 2px #4a90d9;
+}
+
+.popularAtivo span {
+  color: #4a90d9;
 }
 
 /* Título das seções */

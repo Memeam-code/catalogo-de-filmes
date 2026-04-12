@@ -7,17 +7,17 @@ import styles from './page.module.css';
 const API_KEY = 'aa9290b3';
 
 const FILMES_POPULARES = [
-  { titulo: 'Inception', emoji: '🌀' },
-  { titulo: 'Interstellar', emoji: '🚀' },
-  { titulo: 'The Dark Knight', emoji: '🦇' },
-  { titulo: 'Avengers', emoji: '🦸' },
-  { titulo: 'Spider-Man', emoji: '🕷️' },
-  { titulo: 'Avatar', emoji: '🌿' },
-  { titulo: 'Titanic', emoji: '🚢' },
-  { titulo: 'Harry Potter', emoji: '🧙' },
-  { titulo: 'Fast Furious', emoji: '🏎️' },
-  { titulo: 'John Wick', emoji: '🔫' },
-  { titulo: 'Twilight', emoji: '🧛' },
+  'Inception',
+  'Interstellar',
+  'The Dark Knight',
+  'Avengers',
+  'Spider-Man',
+  'Avatar',
+  'Titanic',
+  'Harry Potter',
+  'Fast and Furious',
+  'John Wick',
+  'Twilight',
 ];
 
 export default function Home() {
@@ -30,6 +30,20 @@ export default function Home() {
   const [pagina, setPagina] = useState(1);
   const [totalResultados, setTotalResultados] = useState(0);
   const [filtroTipo, setFiltroTipo] = useState('');
+  const [posteres, setPosteres] = useState({});
+
+  // Busca os posters dos filmes populares uma vez ao carregar
+  useEffect(() => {
+    FILMES_POPULARES.forEach(titulo => {
+      fetch(`https://www.omdbapi.com/?t=${encodeURIComponent(titulo)}&apikey=${API_KEY}`)
+        .then(res => res.json())
+        .then(data => {
+          if (data.Poster && data.Poster !== 'N/A') {
+            setPosteres(prev => ({ ...prev, [titulo]: data.Poster }));
+          }
+        });
+    });
+  }, []);
 
   useEffect(() => {
     setLoading(true);
@@ -108,15 +122,22 @@ export default function Home() {
 
       {/* Barra de filmes populares */}
       <div className={styles.popularesArea}>
-        <p className={styles.popularesLabel}>🔥 Populares:</p>
+        <p className={styles.popularesLabel}>Populares</p>
         <div className={styles.populares}>
-          {FILMES_POPULARES.map(f => (
+          {FILMES_POPULARES.map(titulo => (
             <button
-              key={f.titulo}
-              className={`${styles.popularBtn} ${query === f.titulo ? styles.popularAtivo : ''}`}
-              onClick={() => { setSearch(f.titulo); setQuery(f.titulo); setPagina(1); }}
+              key={titulo}
+              className={`${styles.popularBtn} ${query === titulo ? styles.popularAtivo : ''}`}
+              onClick={() => { setSearch(titulo); setQuery(titulo); setPagina(1); }}
             >
-              {f.emoji} {f.titulo}
+              {posteres[titulo] && (
+                <img
+                  src={posteres[titulo]}
+                  alt={titulo}
+                  className={styles.popularPoster}
+                />
+              )}
+              <span>{titulo}</span>
             </button>
           ))}
         </div>
