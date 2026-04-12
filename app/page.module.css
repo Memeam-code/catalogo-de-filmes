@@ -92,6 +92,51 @@
   border-color: #1a1a2e;
 }
 
+/* Barra de populares */
+.popularesArea {
+  margin-bottom: 32px;
+}
+
+.popularesLabel {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #888;
+  margin-bottom: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.populares {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.popularBtn {
+  padding: 8px 16px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  background: #fff;
+  color: #1a1a2e;
+  border: 2px solid #e0e0e0;
+  border-radius: 20px;
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.popularBtn:hover {
+  border-color: #4a90d9;
+  color: #4a90d9;
+  background: #f0f6ff;
+}
+
+.popularAtivo {
+  background: #4a90d9;
+  color: #fff;
+  border-color: #4a90d9;
+}
+
 /* Título das seções */
 .sectionTitle {
   font-size: 1.5rem;

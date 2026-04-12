@@ -6,6 +6,19 @@ import styles from './page.module.css';
 
 const API_KEY = 'aa9290b3';
 
+const FILMES_POPULARES = [
+  { titulo: 'Inception', emoji: '🌀' },
+  { titulo: 'Interstellar', emoji: '🚀' },
+  { titulo: 'The Dark Knight', emoji: '🦇' },
+  { titulo: 'Avengers', emoji: '🦸' },
+  { titulo: 'Spider-Man', emoji: '🕷️' },
+  { titulo: 'Avatar', emoji: '🌿' },
+  { titulo: 'Titanic', emoji: '🚢' },
+  { titulo: 'Harry Potter', emoji: '🧙' },
+  { titulo: 'Fast Furious', emoji: '🏎️' },
+  { titulo: 'John Wick', emoji: '🔫' },
+];
+
 export default function Home() {
   const [movies, setMovies] = useState([]);
   const [favorites, setFavorites] = useState([]);
@@ -90,6 +103,22 @@ export default function Home() {
             {tipo === '' ? 'Todos' : tipo === 'movie' ? 'Filmes' : tipo === 'series' ? 'Séries' : 'Episódios'}
           </button>
         ))}
+      </div>
+
+      {/* Barra de filmes populares */}
+      <div className={styles.popularesArea}>
+        <p className={styles.popularesLabel}>🔥 Populares:</p>
+        <div className={styles.populares}>
+          {FILMES_POPULARES.map(f => (
+            <button
+              key={f.titulo}
+              className={`${styles.popularBtn} ${query === f.titulo ? styles.popularAtivo : ''}`}
+              onClick={() => { setSearch(f.titulo); setQuery(f.titulo); setPagina(1); }}
+            >
+              {f.emoji} {f.titulo}
+            </button>
+          ))}
+        </div>
       </div>
 
       {/* Lista de filmes */}
