@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import styles from './page.module.css';
 
-const API_KEY = 'aa9290b3';
+const API_KEY = 'trilogy';
 
 export default function DetalheFilme() {
   const { id } = useParams();

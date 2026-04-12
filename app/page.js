@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import styles from './page.module.css';
 
-const API_KEY = 'aa9290b3';
+const API_KEY = 'trilogy';
 
 const FILMES_POPULARES = [
   'Inception',
