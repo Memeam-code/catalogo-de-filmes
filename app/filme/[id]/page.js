@@ -2,9 +2,15 @@
 
 import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
+import { createClient } from '@supabase/supabase-js';
 import styles from './page.module.css';
 
 const API_KEY = 'trilogy';
+
+const supabase = createClient(
+  'https://vizrttslxakwoyhajvyo.supabase.co',
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZpenJ0dHNseGFrd295aGFqdnlvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU5NTQ0ODYsImV4cCI6MjA5MTUzMDQ4Nn0.PGYsEa0QMJrJzFi60V0DP1FdPy60NYqzH6ywAMArQ1c'
+);
 
 const GENEROS = {
   'Action': 'Ação', 'Adventure': 'Aventura', 'Animation': 'Animação',
@@ -23,13 +29,6 @@ const PAISES = {
   'China': 'China', 'Australia': 'Austrália', 'Canada': 'Canadá',
   'Brazil': 'Brasil', 'Mexico': 'México', 'India': 'Índia',
   'Russia': 'Rússia', 'New Zealand': 'Nova Zelândia',
-};
-
-const IDIOMAS = {
-  'English': 'Inglês', 'Portuguese': 'Português', 'Spanish': 'Espanhol',
-  'French': 'Francês', 'German': 'Alemão', 'Italian': 'Italiano',
-  'Japanese': 'Japonês', 'Korean': 'Coreano', 'Mandarin': 'Mandarim',
-  'Hindi': 'Hindi', 'Arabic': 'Árabe', 'Russian': 'Russo',
 };
 
 const MESES = {
@@ -55,7 +54,6 @@ function traduzirData(data) {
 async function traduzir(texto) {
   if (!texto || texto === 'N/A') return texto;
   try {
-    // MyMemory tem limite de ~450 chars — divide em frases se necessário
     const frases = texto.match(/[^.!?]+[.!?]+/g) || [texto];
     const chunks = [];
     let chunk = '';
@@ -89,39 +87,66 @@ export default function DetalheFilme() {
   const router = useRouter();
   const [filme, setFilme] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [traducoes, setTraducoes] = useState({});
-  const [traduzindo, setTraduzindo] = useState(false);
+  const [plotPT, setPlotPT] = useState('');
+  const [awardsPT, setAwardsPT] = useState('');
 
+  // Comentários
+  const [comentarios, setComentarios] = useState([]);
+  const [nome, setNome] = useState('');
+  const [texto, setTexto] = useState('');
+  const [enviando, setEnviando] = useState(false);
+
+  // Busca filme
   useEffect(() => {
     fetch(`https://www.omdbapi.com/?i=${id}&apikey=${API_KEY}&plot=full`)
       .then(res => res.json())
-      .then(data => {
+      .then(async data => {
         setFilme(data);
-        setLoading(false);
-
-        // Traduz automaticamente os campos em inglês
         if (data.Response !== 'False') {
-          setTraduzindo(true);
-          const campos = [];
-
-          if (data.Plot && data.Plot !== 'N/A') campos.push(['plot', data.Plot]);
-          if (data.Awards && data.Awards !== 'N/A') campos.push(['awards', data.Awards]);
-
-          Promise.all(
-            campos.map(([chave, valor]) =>
-              traduzir(valor).then(resultado => [chave, resultado])
-            )
-          ).then(resultados => {
-            const novasTraducoes = {};
-            resultados.forEach(([chave, valor]) => {
-              novasTraducoes[chave] = valor;
-            });
-            setTraducoes(novasTraducoes);
-            setTraduzindo(false);
-          });
+          const [plot, awards] = await Promise.all([
+            traduzir(data.Plot),
+            traduzir(data.Awards),
+          ]);
+          setPlotPT(plot);
+          setAwardsPT(awards);
         }
+        setLoading(false);
       });
   }, [id]);
+
+  // Busca comentários
+  useEffect(() => {
+    buscarComentarios();
+  }, [id]);
+
+  async function buscarComentarios() {
+    const { data } = await supabase
+      .from('comentarios')
+      .select('*')
+      .eq('filme_id', id)
+      .order('criado_em', { ascending: false });
+    if (data) setComentarios(data);
+  }
+
+  async function enviarComentario(e) {
+    e.preventDefault();
+    if (!nome.trim() || !texto.trim()) return;
+    setEnviando(true);
+    await supabase.from('comentarios').insert({
+      filme_id: id,
+      filme_titulo: filme?.Title || '',
+      nome: nome.trim(),
+      texto: texto.trim(),
+    });
+    setTexto('');
+    setEnviando(false);
+    buscarComentarios();
+  }
+
+  function formatarData(iso) {
+    const d = new Date(iso);
+    return d.toLocaleDateString('pt-BR', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+  }
 
   if (loading) {
     return (
@@ -136,7 +161,7 @@ export default function DetalheFilme() {
     return (
       <div className={styles.erroPagina}>
         <p>Filme não encontrado.</p>
-        <button onClick={() => router.back()} className={styles.voltarBtn}>← Voltar</button>
+        <button onClick={() => router.back()} className={styles.voltarBtn}>Voltar</button>
       </div>
     );
   }
@@ -183,10 +208,10 @@ export default function DetalheFilme() {
           <h1 className={styles.titulo}>{filme.Title}</h1>
 
           <div className={styles.metaDados}>
-            {filme.Year !== 'N/A' && <span>📅 {filme.Year}</span>}
-            {filme.Released !== 'N/A' && <span>🗓 Lançamento: {traduzirData(filme.Released)}</span>}
-            {filme.Runtime !== 'N/A' && <span>⏱ {filme.Runtime}</span>}
-            {filme.Country !== 'N/A' && <span>🌍 {traduzirLista(filme.Country, PAISES)}</span>}
+            {filme.Year !== 'N/A' && <span>{filme.Year}</span>}
+            {filme.Released !== 'N/A' && <span>Lançamento: {traduzirData(filme.Released)}</span>}
+            {filme.Runtime !== 'N/A' && <span>{filme.Runtime}</span>}
+            {filme.Country !== 'N/A' && <span>{traduzirLista(filme.Country, PAISES)}</span>}
           </div>
 
           {filme.Genre !== 'N/A' && (
@@ -200,11 +225,7 @@ export default function DetalheFilme() {
           {filme.Plot !== 'N/A' && (
             <div className={styles.secao}>
               <h2>Descrição</h2>
-              {traduzindo ? (
-                <p className={styles.traduzindo}>Traduzindo...</p>
-              ) : (
-                <p>{traducoes.plot || filme.Plot}</p>
-              )}
+              <p>{plotPT || filme.Plot}</p>
             </div>
           )}
 
@@ -233,13 +254,60 @@ export default function DetalheFilme() {
             </div>
           )}
 
-          {filme.Awards !== 'N/A' && (
+          {awardsPT && awardsPT !== 'N/A' && (
             <div className={styles.premios}>
-              🏆 {traducoes.awards || filme.Awards}
+              🏆 {awardsPT}
             </div>
           )}
         </div>
       </div>
+
+      {/* Seção de comentários */}
+      <section className={styles.comentariosSecao}>
+        <h2 className={styles.comentariosTitulo}>Comentários</h2>
+
+        {/* Formulário */}
+        <form className={styles.comentarioForm} onSubmit={enviarComentario}>
+          <input
+            className={styles.comentarioInput}
+            type="text"
+            placeholder="Seu nome"
+            value={nome}
+            onChange={e => setNome(e.target.value)}
+            maxLength={50}
+            required
+          />
+          <textarea
+            className={styles.comentarioTextarea}
+            placeholder={`O que você achou de "${filme.Title}"?`}
+            value={texto}
+            onChange={e => setTexto(e.target.value)}
+            maxLength={500}
+            rows={3}
+            required
+          />
+          <button className={styles.comentarioBotao} type="submit" disabled={enviando}>
+            {enviando ? 'Enviando...' : 'Comentar'}
+          </button>
+        </form>
+
+        {/* Lista de comentários */}
+        <div className={styles.comentarioLista}>
+          {comentarios.length === 0 ? (
+            <p className={styles.semComentarios}>Nenhum comentário ainda. Seja o primeiro!</p>
+          ) : (
+            comentarios.map(c => (
+              <div key={c.id} className={styles.comentarioCard}>
+                <div className={styles.comentarioTopo}>
+                  <span className={styles.comentarioNome}>{c.nome}</span>
+                  <span className={styles.comentarioData}>{formatarData(c.criado_em)}</span>
+                </div>
+                <p className={styles.comentarioTexto}>{c.texto}</p>
+              </div>
+            ))
+          )}
+        </div>
+      </section>
     </main>
   );
 }
