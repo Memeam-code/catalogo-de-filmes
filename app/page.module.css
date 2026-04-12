@@ -1,11 +1,9 @@
-/* Página principal */
 .main {
   max-width: 1200px;
   margin: 0 auto;
   padding: 40px 24px;
 }
 
-/* Cabeçalho */
 .header {
   text-align: center;
   margin-bottom: 40px;
@@ -23,12 +21,12 @@
   color: #666;
 }
 
-/* Formulário de busca */
+/* Busca */
 .searchForm {
   display: flex;
   gap: 12px;
   justify-content: center;
-  margin-bottom: 40px;
+  margin-bottom: 20px;
 }
 
 .searchInput {
@@ -62,6 +60,38 @@
   background-color: #4a90d9;
 }
 
+/* Filtros */
+.filtros {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 36px;
+  flex-wrap: wrap;
+}
+
+.filtroBotao {
+  padding: 8px 20px;
+  border: 2px solid #ddd;
+  border-radius: 20px;
+  background: #fff;
+  color: #555;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.filtroBotao:hover {
+  border-color: #1a1a2e;
+  color: #1a1a2e;
+}
+
+.filtroAtivo {
+  background: #1a1a2e;
+  color: #fff;
+  border-color: #1a1a2e;
+}
+
 /* Título das seções */
 .sectionTitle {
   font-size: 1.5rem;
@@ -73,7 +103,43 @@
   display: inline-block;
 }
 
-/* Grid de filmes */
+.total {
+  font-size: 1rem;
+  color: #888;
+  font-weight: 400;
+}
+
+/* Loading */
+.loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  padding: 60px 0;
+  color: #888;
+}
+
+.spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid #eee;
+  border-top-color: #4a90d9;
+  border-radius: 50%;
+  animation: girar 0.8s linear infinite;
+}
+
+@keyframes girar {
+  to { transform: rotate(360deg); }
+}
+
+.erroMsg {
+  text-align: center;
+  padding: 40px;
+  color: #888;
+  font-size: 1rem;
+}
+
+/* Grid */
 .grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
@@ -81,7 +147,7 @@
   margin-bottom: 16px;
 }
 
-/* Card de filme */
+/* Card */
 .card {
   background: #fff;
   border-radius: 12px;
@@ -97,21 +163,28 @@
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
 }
 
-/* Imagem do poster */
 .poster {
   width: 100%;
   height: 220px;
   object-fit: cover;
   display: block;
+  cursor: pointer;
 }
 
-/* Informações do card */
 .cardInfo {
   padding: 12px;
   display: flex;
   flex-direction: column;
   flex: 1;
   gap: 6px;
+}
+
+.badge {
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  color: #4a90d9;
+  letter-spacing: 0.5px;
 }
 
 .movieTitle {
@@ -126,50 +199,99 @@
   color: #888;
 }
 
-/* Botão de favoritar */
-.favButton {
+.cardBotoes {
+  display: flex;
+  gap: 8px;
   margin-top: auto;
-  padding: 8px;
-  font-size: 0.8rem;
+}
+
+.detalheLink {
+  flex: 1;
+  padding: 7px;
+  font-size: 0.78rem;
   font-weight: 600;
-  background-color: #fff;
-  color: #1a1a2e;
-  border: 2px solid #1a1a2e;
+  text-align: center;
+  background: #1a1a2e;
+  color: #fff;
+  border-radius: 6px;
+  transition: background 0.2s;
+  text-decoration: none;
+}
+
+.detalheLink:hover {
+  background: #4a90d9;
+}
+
+.favButton {
+  padding: 7px 10px;
+  font-size: 1rem;
+  background: #fff;
+  border: 2px solid #ddd;
   border-radius: 6px;
   cursor: pointer;
   transition: all 0.2s;
 }
 
 .favButton:hover:not(:disabled) {
-  background-color: #1a1a2e;
-  color: #fff;
+  border-color: #f5c518;
 }
 
-.favButton:disabled {
+.favButtonActive {
+  background: #fff8e1;
+  border-color: #f5c518;
+}
+
+/* Paginação */
+.paginacao {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 20px;
+  margin-top: 32px;
+  padding-top: 24px;
+  border-top: 2px solid #eee;
+}
+
+.paginaBotao {
+  padding: 10px 22px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  background: #1a1a2e;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.paginaBotao:hover:not(:disabled) {
+  background: #4a90d9;
+}
+
+.paginaBotao:disabled {
+  background: #ccc;
   cursor: default;
 }
 
-/* Botão favoritado (ativo) */
-.favButtonActive {
-  background-color: #f5c518;
-  border-color: #f5c518;
-  color: #1a1a2e;
+.paginaInfo {
+  font-size: 0.9rem;
+  color: #555;
+  font-weight: 500;
 }
 
-/* Seção de favoritos */
+/* Favoritos */
 .favoritesSection {
   margin-top: 48px;
   padding-top: 32px;
   border-top: 2px solid #eee;
 }
 
-/* Botão de remover favorito */
 .removeButton {
   margin-top: auto;
   padding: 8px;
   font-size: 0.8rem;
   font-weight: 600;
-  background-color: #fff;
+  background: #fff;
   color: #e53e3e;
   border: 2px solid #e53e3e;
   border-radius: 6px;
@@ -178,11 +300,11 @@
 }
 
 .removeButton:hover {
-  background-color: #e53e3e;
+  background: #e53e3e;
   color: #fff;
 }
 
-/* Responsivo para mobile */
+/* Mobile */
 @media (max-width: 600px) {
   .header h1 {
     font-size: 1.8rem;

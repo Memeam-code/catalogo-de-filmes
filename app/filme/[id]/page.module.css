@@ -1,0 +1,229 @@
+.main {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 40px 24px;
+}
+
+.voltarBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 20px;
+  background: #1a1a2e;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  margin-bottom: 32px;
+  transition: background 0.2s;
+}
+
+.voltarBtn:hover {
+  background: #4a90d9;
+}
+
+.detalhe {
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  gap: 40px;
+  align-items: start;
+}
+
+/* Área do poster */
+.posterArea {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  position: sticky;
+  top: 24px;
+}
+
+.poster {
+  width: 100%;
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+}
+
+.nota {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: #f5c518;
+}
+
+.nota span {
+  font-size: 1rem;
+  color: #888;
+  font-weight: 400;
+}
+
+.votos {
+  font-size: 0.8rem;
+  color: #888;
+}
+
+/* Informações */
+.info {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.topo {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.badge {
+  padding: 4px 12px;
+  background: #4a90d9;
+  color: #fff;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.classificacao {
+  padding: 4px 12px;
+  background: #eee;
+  color: #444;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.titulo {
+  font-size: 2.2rem;
+  font-weight: 700;
+  color: #1a1a2e;
+  line-height: 1.2;
+}
+
+.metaDados {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.metaDados span {
+  font-size: 0.9rem;
+  color: #555;
+  background: #f0f4f8;
+  padding: 6px 12px;
+  border-radius: 6px;
+}
+
+.generos {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.genero {
+  padding: 4px 14px;
+  border: 2px solid #1a1a2e;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: #1a1a2e;
+}
+
+/* Seções de texto */
+.secao h2 {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #1a1a2e;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 8px;
+  padding-bottom: 6px;
+  border-bottom: 2px solid #4a90d9;
+  display: inline-block;
+}
+
+.secao p {
+  font-size: 0.95rem;
+  color: #444;
+  line-height: 1.7;
+}
+
+/* Elenco */
+.elenco {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.ator {
+  padding: 6px 14px;
+  background: #1a1a2e;
+  color: #fff;
+  border-radius: 20px;
+  font-size: 0.85rem;
+}
+
+/* Prêmios */
+.premios {
+  background: #fff8e1;
+  border-left: 4px solid #f5c518;
+  padding: 12px 16px;
+  border-radius: 0 8px 8px 0;
+  font-size: 0.9rem;
+  color: #555;
+}
+
+/* Loading e erro */
+.loadingPage {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 60vh;
+  gap: 16px;
+  color: #888;
+}
+
+.erroPagina {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 60vh;
+  gap: 16px;
+}
+
+.spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid #eee;
+  border-top-color: #4a90d9;
+  border-radius: 50%;
+  animation: girar 0.8s linear infinite;
+}
+
+@keyframes girar {
+  to { transform: rotate(360deg); }
+}
+
+/* Mobile */
+@media (max-width: 700px) {
+  .detalhe {
+    grid-template-columns: 1fr;
+  }
+
+  .posterArea {
+    position: static;
+  }
+
+  .poster {
+    max-width: 200px;
+    margin: 0 auto;
+  }
+
+  .titulo {
+    font-size: 1.6rem;
+  }
+}
