@@ -6,6 +6,57 @@ import styles from './page.module.css';
 
 const API_KEY = 'trilogy';
 
+const GENEROS = {
+  'Action': 'Ação', 'Adventure': 'Aventura', 'Animation': 'Animação',
+  'Biography': 'Biografia', 'Comedy': 'Comédia', 'Crime': 'Crime',
+  'Documentary': 'Documentário', 'Drama': 'Drama', 'Family': 'Família',
+  'Fantasy': 'Fantasia', 'History': 'História', 'Horror': 'Terror',
+  'Music': 'Música', 'Musical': 'Musical', 'Mystery': 'Mistério',
+  'Romance': 'Romance', 'Sci-Fi': 'Ficção Científica', 'Sport': 'Esporte',
+  'Thriller': 'Thriller', 'War': 'Guerra', 'Western': 'Faroeste',
+};
+
+const PAISES = {
+  'United States': 'Estados Unidos', 'United Kingdom': 'Reino Unido',
+  'France': 'França', 'Germany': 'Alemanha', 'Italy': 'Itália',
+  'Spain': 'Espanha', 'Japan': 'Japão', 'South Korea': 'Coreia do Sul',
+  'China': 'China', 'Australia': 'Austrália', 'Canada': 'Canadá',
+  'Brazil': 'Brasil', 'Mexico': 'México', 'India': 'Índia',
+  'Russia': 'Rússia', 'New Zealand': 'Nova Zelândia',
+};
+
+const IDIOMAS = {
+  'English': 'Inglês', 'Portuguese': 'Português', 'Spanish': 'Espanhol',
+  'French': 'Francês', 'German': 'Alemão', 'Italian': 'Italiano',
+  'Japanese': 'Japonês', 'Korean': 'Coreano', 'Mandarin': 'Mandarim',
+  'Hindi': 'Hindi', 'Arabic': 'Árabe', 'Russian': 'Russo',
+};
+
+const MESES = {
+  'Jan': 'jan', 'Feb': 'fev', 'Mar': 'mar', 'Apr': 'abr',
+  'May': 'mai', 'Jun': 'jun', 'Jul': 'jul', 'Aug': 'ago',
+  'Sep': 'set', 'Oct': 'out', 'Nov': 'nov', 'Dec': 'dez',
+};
+
+function traduzirLista(texto, mapa) {
+  if (!texto || texto === 'N/A') return texto;
+  return texto.split(', ').map(item => mapa[item.trim()] || item.trim()).join(', ');
+}
+
+function traduzirData(data) {
+  if (!data || data === 'N/A') return data;
+  let resultado = data;
+  Object.entries(MESES).forEach(([en, pt]) => {
+    resultado = resultado.replace(en, pt);
+  });
+  return resultado;
+}
+
+function traduzirDuracao(runtime) {
+  if (!runtime || runtime === 'N/A') return runtime;
+  return runtime.replace('min', 'min');
+}
+
 export default function DetalheFilme() {
   const { id } = useParams();
   const router = useRouter();
@@ -39,6 +90,9 @@ export default function DetalheFilme() {
     );
   }
 
+  const temPoster = filme.Poster && filme.Poster !== 'N/A';
+  const tipo = filme.Type === 'movie' ? 'Filme' : filme.Type === 'series' ? 'Série' : 'Episódio';
+
   return (
     <main className={styles.main}>
       <button onClick={() => router.back()} className={styles.voltarBtn}>
@@ -48,11 +102,14 @@ export default function DetalheFilme() {
       <div className={styles.detalhe}>
         {/* Poster */}
         <div className={styles.posterArea}>
-          <img
-            src={filme.Poster !== 'N/A' ? filme.Poster : 'https://placehold.co/300x440?text=Sem+Imagem'}
-            alt={filme.Title}
-            className={styles.poster}
-          />
+          {temPoster ? (
+            <img src={filme.Poster} alt={filme.Title} className={styles.poster} />
+          ) : (
+            <div className={styles.semPoster}>
+              <span>🎬</span>
+              <p>Sem imagem disponível</p>
+            </div>
+          )}
           {filme.imdbRating !== 'N/A' && (
             <div className={styles.nota}>
               ⭐ {filme.imdbRating} <span>/10</span>
@@ -66,9 +123,7 @@ export default function DetalheFilme() {
         {/* Informações */}
         <div className={styles.info}>
           <div className={styles.topo}>
-            <span className={styles.badge}>
-              {filme.Type === 'movie' ? 'Filme' : filme.Type === 'series' ? 'Série' : 'Episódio'}
-            </span>
+            <span className={styles.badge}>{tipo}</span>
             {filme.Rated !== 'N/A' && (
               <span className={styles.classificacao}>{filme.Rated}</span>
             )}
@@ -77,17 +132,27 @@ export default function DetalheFilme() {
           <h1 className={styles.titulo}>{filme.Title}</h1>
 
           <div className={styles.metaDados}>
-            {filme.Year !== 'N/A' && <span>📅 {filme.Year}</span>}
-            {filme.Released !== 'N/A' && <span>🗓 Lançamento: {filme.Released}</span>}
-            {filme.Runtime !== 'N/A' && <span>⏱ {filme.Runtime}</span>}
-            {filme.Country !== 'N/A' && <span>🌍 {filme.Country}</span>}
-            {filme.Language !== 'N/A' && <span>🗣 {filme.Language}</span>}
+            {filme.Year !== 'N/A' && (
+              <span>📅 {filme.Year}</span>
+            )}
+            {filme.Released !== 'N/A' && (
+              <span>🗓 Lançamento: {traduzirData(filme.Released)}</span>
+            )}
+            {filme.Runtime !== 'N/A' && (
+              <span>⏱ {traduzirDuracao(filme.Runtime)}</span>
+            )}
+            {filme.Country !== 'N/A' && (
+              <span>🌍 {traduzirLista(filme.Country, PAISES)}</span>
+            )}
+            {filme.Language !== 'N/A' && (
+              <span>🗣 {traduzirLista(filme.Language, IDIOMAS)}</span>
+            )}
           </div>
 
           {filme.Genre !== 'N/A' && (
             <div className={styles.generos}>
               {filme.Genre.split(', ').map(g => (
-                <span key={g} className={styles.genero}>{g}</span>
+                <span key={g} className={styles.genero}>{GENEROS[g.trim()] || g}</span>
               ))}
             </div>
           )}

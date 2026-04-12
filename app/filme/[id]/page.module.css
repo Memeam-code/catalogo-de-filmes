@@ -47,6 +47,28 @@
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
 }
 
+.semPoster {
+  width: 100%;
+  aspect-ratio: 2/3;
+  background: #e8edf2;
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  color: #aaa;
+}
+
+.semPoster span {
+  font-size: 3rem;
+}
+
+.semPoster p {
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+
 .nota {
   font-size: 1.8rem;
   font-weight: 700;
