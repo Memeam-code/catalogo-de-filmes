@@ -55,14 +55,30 @@ function traduzirData(data) {
 async function traduzir(texto) {
   if (!texto || texto === 'N/A') return texto;
   try {
-    const res = await fetch(
-      `https://api.mymemory.translated.net/get?q=${encodeURIComponent(texto)}&langpair=en|pt-BR`
-    );
-    const data = await res.json();
-    if (data.responseStatus === 200) {
-      return data.responseData.translatedText;
+    // MyMemory tem limite de ~450 chars — divide em frases se necessário
+    const frases = texto.match(/[^.!?]+[.!?]+/g) || [texto];
+    const chunks = [];
+    let chunk = '';
+    for (const frase of frases) {
+      if ((chunk + frase).length > 400) {
+        if (chunk) chunks.push(chunk.trim());
+        chunk = frase;
+      } else {
+        chunk += frase;
+      }
     }
-    return texto;
+    if (chunk) chunks.push(chunk.trim());
+
+    const traduzidos = await Promise.all(
+      chunks.map(async (c) => {
+        const res = await fetch(
+          `https://api.mymemory.translated.net/get?q=${encodeURIComponent(c)}&langpair=en|pt-BR`
+        );
+        const data = await res.json();
+        return data.responseStatus === 200 ? data.responseData.translatedText : c;
+      })
+    );
+    return traduzidos.join(' ');
   } catch {
     return texto;
   }
@@ -171,7 +187,6 @@ export default function DetalheFilme() {
             {filme.Released !== 'N/A' && <span>🗓 Lançamento: {traduzirData(filme.Released)}</span>}
             {filme.Runtime !== 'N/A' && <span>⏱ {filme.Runtime}</span>}
             {filme.Country !== 'N/A' && <span>🌍 {traduzirLista(filme.Country, PAISES)}</span>}
-            {filme.Language !== 'N/A' && <span>🗣 {traduzirLista(filme.Language, IDIOMAS)}</span>}
           </div>
 
           {filme.Genre !== 'N/A' && (
