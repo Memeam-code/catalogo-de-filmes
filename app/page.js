@@ -17,6 +17,7 @@ const FILMES_POPULARES = [
   { titulo: 'Harry Potter', emoji: '🧙' },
   { titulo: 'Fast Furious', emoji: '🏎️' },
   { titulo: 'John Wick', emoji: '🔫' },
+  { titulo: 'Twilight', emoji: '🧛' },
 ];
 
 export default function Home() {
