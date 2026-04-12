@@ -52,9 +52,20 @@ function traduzirData(data) {
   return resultado;
 }
 
-function traduzirDuracao(runtime) {
-  if (!runtime || runtime === 'N/A') return runtime;
-  return runtime.replace('min', 'min');
+async function traduzir(texto) {
+  if (!texto || texto === 'N/A') return texto;
+  try {
+    const res = await fetch(
+      `https://api.mymemory.translated.net/get?q=${encodeURIComponent(texto)}&langpair=en|pt-BR`
+    );
+    const data = await res.json();
+    if (data.responseStatus === 200) {
+      return data.responseData.translatedText;
+    }
+    return texto;
+  } catch {
+    return texto;
+  }
 }
 
 export default function DetalheFilme() {
@@ -62,6 +73,8 @@ export default function DetalheFilme() {
   const router = useRouter();
   const [filme, setFilme] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [traducoes, setTraducoes] = useState({});
+  const [traduzindo, setTraduzindo] = useState(false);
 
   useEffect(() => {
     fetch(`https://www.omdbapi.com/?i=${id}&apikey=${API_KEY}&plot=full`)
@@ -69,6 +82,28 @@ export default function DetalheFilme() {
       .then(data => {
         setFilme(data);
         setLoading(false);
+
+        // Traduz automaticamente os campos em inglês
+        if (data.Response !== 'False') {
+          setTraduzindo(true);
+          const campos = [];
+
+          if (data.Plot && data.Plot !== 'N/A') campos.push(['plot', data.Plot]);
+          if (data.Awards && data.Awards !== 'N/A') campos.push(['awards', data.Awards]);
+
+          Promise.all(
+            campos.map(([chave, valor]) =>
+              traduzir(valor).then(resultado => [chave, resultado])
+            )
+          ).then(resultados => {
+            const novasTraducoes = {};
+            resultados.forEach(([chave, valor]) => {
+              novasTraducoes[chave] = valor;
+            });
+            setTraducoes(novasTraducoes);
+            setTraduzindo(false);
+          });
+        }
       });
   }, [id]);
 
@@ -132,21 +167,11 @@ export default function DetalheFilme() {
           <h1 className={styles.titulo}>{filme.Title}</h1>
 
           <div className={styles.metaDados}>
-            {filme.Year !== 'N/A' && (
-              <span>📅 {filme.Year}</span>
-            )}
-            {filme.Released !== 'N/A' && (
-              <span>🗓 Lançamento: {traduzirData(filme.Released)}</span>
-            )}
-            {filme.Runtime !== 'N/A' && (
-              <span>⏱ {traduzirDuracao(filme.Runtime)}</span>
-            )}
-            {filme.Country !== 'N/A' && (
-              <span>🌍 {traduzirLista(filme.Country, PAISES)}</span>
-            )}
-            {filme.Language !== 'N/A' && (
-              <span>🗣 {traduzirLista(filme.Language, IDIOMAS)}</span>
-            )}
+            {filme.Year !== 'N/A' && <span>📅 {filme.Year}</span>}
+            {filme.Released !== 'N/A' && <span>🗓 Lançamento: {traduzirData(filme.Released)}</span>}
+            {filme.Runtime !== 'N/A' && <span>⏱ {filme.Runtime}</span>}
+            {filme.Country !== 'N/A' && <span>🌍 {traduzirLista(filme.Country, PAISES)}</span>}
+            {filme.Language !== 'N/A' && <span>🗣 {traduzirLista(filme.Language, IDIOMAS)}</span>}
           </div>
 
           {filme.Genre !== 'N/A' && (
@@ -160,7 +185,11 @@ export default function DetalheFilme() {
           {filme.Plot !== 'N/A' && (
             <div className={styles.secao}>
               <h2>Descrição</h2>
-              <p>{filme.Plot}</p>
+              {traduzindo ? (
+                <p className={styles.traduzindo}>Traduzindo...</p>
+              ) : (
+                <p>{traducoes.plot || filme.Plot}</p>
+              )}
             </div>
           )}
 
@@ -191,7 +220,7 @@ export default function DetalheFilme() {
 
           {filme.Awards !== 'N/A' && (
             <div className={styles.premios}>
-              🏆 {filme.Awards}
+              🏆 {traducoes.awards || filme.Awards}
             </div>
           )}
         </div>

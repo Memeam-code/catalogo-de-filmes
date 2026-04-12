@@ -172,6 +172,11 @@
   line-height: 1.7;
 }
 
+.traduzindo {
+  color: #aaa;
+  font-style: italic;
+}
+
 /* Elenco */
 .elenco {
   display: flex;
