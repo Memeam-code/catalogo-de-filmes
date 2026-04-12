@@ -1,8 +1,8 @@
-# Catálogo de Filmes
+# Catálogo de Filmes 🎬
 
-Projeto da Aula Prática de Programação para Web com Next.js.
+Catálogo de filmes desenvolvido na Aula Prática de Programação para Web com Next.js.
 
-## Acesse o projeto online
+## Acesse o catálogo online
 
 https://catalogo-de-filmes-omega.vercel.app
 
@@ -22,6 +22,7 @@ Abra http://localhost:3000 no navegador.
 - Next.js
 - React (useState, useEffect)
 - OMDb API
+- Supabase (comentários)
 
 ## Grupo
 
